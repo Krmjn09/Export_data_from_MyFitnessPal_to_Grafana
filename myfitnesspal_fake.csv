@@ -1,0 +1,28 @@
+import pandas as pd
+import random
+from datetime import datetime, timedelta
+
+# Generate random dates
+def generate_dates(start_date, num_days):
+    return [(start_date - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(num_days)]
+
+# Generate random health data
+def generate_fake_data(num_days):
+    dates = generate_dates(datetime.now(), num_days)
+    data = {
+        "Date": dates,
+        "Calories": [random.randint(1500, 2500) for _ in range(num_days)],
+        "Protein": [random.randint(100, 200) for _ in range(num_days)],
+        "Carbs": [random.randint(200, 300) for _ in range(num_days)],
+        "Fat": [random.randint(50, 100) for _ in range(num_days)]
+    }
+    return pd.DataFrame(data)
+
+# Save to CSV
+def save_to_csv(df, file_path):
+    df.to_csv(file_path, index=False)
+    print(f"Fake CSV saved to {file_path}")
+
+if __name__ == "__main__":
+    fake_data = generate_fake_data(30)  # Generate 30 days of data
+    save_to_csv(fake_data, "myfitnesspal_fake.csv")

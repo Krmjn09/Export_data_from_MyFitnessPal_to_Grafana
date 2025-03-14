@@ -1,0 +1,41 @@
+import pandas as pd
+import influxdb
+
+# Configuration for InfluxDB
+INFLUXDB_HOST = "localhost"
+INFLUXDB_PORT = 8086
+INFLUXDB_USER = ""  # Leave blank if authentication is disabled
+INFLUXDB_PASSWORD = ""  # Leave blank if authentication is disabled
+INFLUXDB_DB = "myfitnesspal_data"
+
+# Connect to InfluxDB
+client = influxdb.InfluxDBClient(
+    host=INFLUXDB_HOST,
+    port=INFLUXDB_PORT,
+    username=INFLUXDB_USER,
+    password=INFLUXDB_PASSWORD,
+    database=INFLUXDB_DB
+)
+
+# Process CSV file
+def process_csv(file_path):
+    df = pd.read_csv(file_path)
+    for _, row in df.iterrows():
+        json_body = [
+            {
+                "measurement": "myfitnesspal",
+                "time": row["Date"],
+                "fields": {
+                    "calories": float(row["Calories"]),
+                    "protein": float(row["Protein"]),
+                    "carbs": float(row["Carbs"]),
+                    "fat": float(row["Fat"])
+                }
+            }
+        ]
+        client.write_points(json_body)
+    print("Data successfully written to InfluxDB")
+
+if __name__ == "__main__":
+    csv_file = "myfitnesspal_fake.csv"  # Path to your CSV file
+    process_csv(csv_file)
